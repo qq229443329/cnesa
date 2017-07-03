@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd"
+	   default-lazy-init="true">
+
+	<description>Spring公共配置 </description>
+
+	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:component-scan base-package="com.cnesa">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+
+	<!-- 使用配置文件加载数据库配置 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:properties/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Alibaba DataSource configuration -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="3" />
+		<property name="minIdle" value="3" />
+		<property name="maxActive" value="500" />
+
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+
+		<!-- 配置监控统计拦截的filters -->
+		<property name="filters" value="stat" />
+	</bean>
+
+	<!-- 数据源配置, 使用Tomcat JDBC连接池 -->
+	<!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"-->
+		  <!--destroy-method="close">-->
+		<!--<property name="driverClass" value="${jdbc.driver}" />-->
+		<!--<property name="jdbcUrl" value="${jdbc.url}" />-->
+		<!--<property name="user" value="${jdbc.username}" />-->
+		<!--<property name="password" value="${jdbc.password}" />-->
+		<!--<property name="initialPoolSize" value="${connection_pools.initial_pool_size}" />-->
+		<!--<property name="minPoolSize" value="${connection_pools.min_pool_size}" />-->
+		<!--<property name="maxPoolSize" value="${connection_pools.max_pool_size}" />-->
+		<!--<property name="maxIdleTime" value="${connection_pools.max_idle_time}" />-->
+		<!--<property name="acquireIncrement" value="${connection_pools.acquire_increment}" />-->
+		<!--<property name="checkoutTimeout" value="${connection_pools.checkout_timeout}" />-->
+	<!--</bean>-->
+
+	<!-- myBatis文件 -->
+	<!-- 通过扫描的模式，扫描目录在com.fashionshow.dao目录下 所有的接口-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.cnesa.bos.dao, com.cnesa.authority.dao"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+	<!-- 配置SqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:config/mybatis-config.xml"/>
+		<property name="mapperLocations" value="classpath*:mapping/*Mapper.xml"></property>
+
+		<!--  baomidou.mybatisplus 分页配置 -->
+		<property name="plugins">
+			<array>
+				<!-- 分页插件配置 -->
+				<bean id="paginationInterceptor" class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+					<property name="dialectType" value="mysql"/>
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 事务管理 属性 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 配置切面 -->
+	<aop:config>
+		<aop:pointcut expression="execution(public * com.cnesa.*.service.impl.*.*(..))" id="pointcutBase" />
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="pointcutBase" />
+	</aop:config>
+
+	<!-- druid spring monitor setting -->
+	<bean id="druid-stat-interceptor"
+		  class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+	</bean>
+		<aop:config proxy-target-class="true">
+		<aop:pointcut expression="execution(public * com.cnesa.*.service.impl.*.*(..))" id="druid-stat-pointcut3" />
+		<aop:pointcut expression="execution(public * com.cnesa.*.dao.*.*(..))" id="druid-stat-pointcut5" />
+		<aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut3" />
+		<aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut5" />
+	</aop:config>
+</beans>

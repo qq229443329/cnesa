@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="logFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/mylogs/logFile.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%thread] %d{HH:mm:ss.SSS} %-5level %logger %line - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="logError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/mylogs/logError.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%thread] %d{HH:mm:ss.SSS} %-5level %logger %line - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!--输出到tomcat的控制台-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder 默认配置为PatternLayoutEncoder -->
+        <encoder>
+            <pattern>[%thread] %d{HH:mm:ss.SSS} %-5level %logger %line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--产品的代码打印debug,不向上传递，其它包打印root的级别-->
+    <logger name="com.cnesa" level="DEBUG" additivity="false">
+        <appender-ref ref="logFile"/>
+    </logger>
+    <logger name="org.springframework" level="info" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="logFile"/>
+    </logger>
+
+    <logger name="com.ibatis" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />
+    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" />
+    <logger name="java.sql.Connection" level="DEBUG" />
+    <logger name="java.sql.Statement" level="DEBUG" />
+    <logger name="java.sql.PreparedStatement" level="DEBUG" />
+
+    <!-- show parameters for hibernate sql 专为 Hibernate 定制 -->
+    <!--<logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />-->
+    <!--<logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="DEBUG" />-->
+    <!--<logger name="org.hibernate.SQL" level="DEBUG" />-->
+    <!--<logger name="org.hibernate.engine.QueryParameters" level="DEBUG" />-->
+    <!--<logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" />-->
+
+    <!--顶级根目录打印级别-->
+    <root level="debug">
+        <appender-ref ref="console" />
+        <appender-ref ref="logError"/>
+        <appender-ref ref="com.ibatis" />
+    </root>
+</configuration>

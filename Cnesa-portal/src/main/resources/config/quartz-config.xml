@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--定义任务类 -->
+    <bean id="weixinTask" class="com.cnesa.weixin.init.WeixinAccessToken"></bean>
+    <!-- 定义调用对象和调用对象的方法-->
+    <bean id="weixinJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="weixinTask"></ref>
+        </property>
+        <property name="targetMethod">
+            <value>getAccessToken</value>
+        </property>
+        <!-- 不允许任务并行处理 -->
+        <property name="concurrent">
+            <value>false</value>
+        </property>
+    </bean>
+    <!--定义触发器 -->
+    <bean id="weixinTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="weixinJob"></ref>
+        </property>
+        <property name="cronExpression">
+            <value>0 */50 */1 * * ?</value>
+        </property>
+    </bean>
+
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  -->
+    <bean id="schedulerFactory" lazy-init="true" autowire="no"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <!--<ref bean="weixinTrigger"/>-->
+            </list>
+        </property>
+    </bean>
+    <!--注解时，使用多线程并发，否则是顺序执行-->
+    <task:executor id="executor" keep-alive="7200" pool-size="100-200" queue-capacity="500" rejection-policy="CALLER_RUNS" />
+    <task:annotation-driven executor="executor"  />
+
+</beans>

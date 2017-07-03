@@ -1,0 +1,7 @@
+/target/
+/java.io.tempdir/
+/catalina.base_IS_UNDEFINED/
+*.iml
+.idea/
+.DS_Store
+/.DS_Store

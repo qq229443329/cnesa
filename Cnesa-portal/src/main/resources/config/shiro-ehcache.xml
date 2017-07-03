@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache updateCheck="false" name="shiroCache">
+
+    <diskStore path="java.io.tempdir/shiroEhcache"/><!-- 达到内存上限后缓存文件保存位置 -->
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            />
+    <cache name="ehcacheName" maxElementsInMemory="10000"
+           eternal="false" timeToIdleSeconds="300000" timeToLiveSeconds="600000"
+           overflowToDisk="true" />
+</ehcache>

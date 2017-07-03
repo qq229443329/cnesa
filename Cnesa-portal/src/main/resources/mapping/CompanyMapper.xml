@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cnesa.authority.dao.CompanyDao">
+  <resultMap id="BaseResultMap" type="com.cnesa.authority.entity.Company">
+    <constructor>
+      <idArg column="id" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="code" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="description" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="industry" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="people_size" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="working_time" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="legal_people" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="legal_mobile" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="contact_people" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="contact_mobile" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="busniess_num" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="busniess_license" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="icon_logo" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="region" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="location" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, code, name, description, industry, people_size, working_time, legal_people, legal_mobile,
+    contact_people, contact_mobile, busniess_num, busniess_license, icon_logo, region,
+    location, create_time
+  </sql>
+  <select id="selectByExample" parameterType="com.cnesa.authority.entity.CompanyExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from MG_COMPANY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from MG_COMPANY
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MG_COMPANY
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cnesa.authority.entity.CompanyExample">
+    delete from MG_COMPANY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cnesa.authority.entity.Company">
+    <selectKey keyProperty="id" resultType="String" order="BEFORE" keyColumn="id">
+      SELECT UUID() AS id;
+    </selectKey>
+    insert into MG_COMPANY (id, code, name,
+    description, industry, people_size,
+    working_time, legal_people, legal_mobile,
+    contact_people, contact_mobile, busniess_num,
+    busniess_license, icon_logo, region,
+    location, create_time)
+    values (#{id,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+    #{description,jdbcType=VARCHAR}, #{industry,jdbcType=VARCHAR}, #{peopleSize,jdbcType=VARCHAR},
+    #{workingTime,jdbcType=VARCHAR}, #{legalPeople,jdbcType=VARCHAR}, #{legalMobile,jdbcType=VARCHAR},
+    #{contactPeople,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, #{busniessNum,jdbcType=VARCHAR},
+    #{busniessLicense,jdbcType=VARCHAR}, #{iconLogo,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR},
+    #{location,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cnesa.authority.entity.Company">
+    <selectKey keyProperty="id" resultType="String" order="BEFORE" keyColumn="id">
+      SELECT UUID() AS id;
+    </selectKey>
+    insert into MG_COMPANY
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="industry != null">
+        industry,
+      </if>
+      <if test="peopleSize != null">
+        people_size,
+      </if>
+      <if test="workingTime != null">
+        working_time,
+      </if>
+      <if test="legalPeople != null">
+        legal_people,
+      </if>
+      <if test="legalMobile != null">
+        legal_mobile,
+      </if>
+      <if test="contactPeople != null">
+        contact_people,
+      </if>
+      <if test="contactMobile != null">
+        contact_mobile,
+      </if>
+      <if test="busniessNum != null">
+        busniess_num,
+      </if>
+      <if test="busniessLicense != null">
+        busniess_license,
+      </if>
+      <if test="iconLogo != null">
+        icon_logo,
+      </if>
+      <if test="region != null">
+        region,
+      </if>
+      <if test="location != null">
+        location,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="industry != null">
+        #{industry,jdbcType=VARCHAR},
+      </if>
+      <if test="peopleSize != null">
+        #{peopleSize,jdbcType=VARCHAR},
+      </if>
+      <if test="workingTime != null">
+        #{workingTime,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPeople != null">
+        #{legalPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="legalMobile != null">
+        #{legalMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPeople != null">
+        #{contactPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null">
+        #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="busniessNum != null">
+        #{busniessNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busniessLicense != null">
+        #{busniessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="iconLogo != null">
+        #{iconLogo,jdbcType=VARCHAR},
+      </if>
+      <if test="region != null">
+        #{region,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null">
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cnesa.authority.entity.CompanyExample" resultType="java.lang.Long">
+    select count(*) from MG_COMPANY
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update MG_COMPANY
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null">
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+      <if test="record.industry != null">
+        industry = #{record.industry,jdbcType=VARCHAR},
+      </if>
+      <if test="record.peopleSize != null">
+        people_size = #{record.peopleSize,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workingTime != null">
+        working_time = #{record.workingTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.legalPeople != null">
+        legal_people = #{record.legalPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="record.legalMobile != null">
+        legal_mobile = #{record.legalMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactPeople != null">
+        contact_people = #{record.contactPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactMobile != null">
+        contact_mobile = #{record.contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busniessNum != null">
+        busniess_num = #{record.busniessNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busniessLicense != null">
+        busniess_license = #{record.busniessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="record.iconLogo != null">
+        icon_logo = #{record.iconLogo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.region != null">
+        region = #{record.region,jdbcType=VARCHAR},
+      </if>
+      <if test="record.location != null">
+        location = #{record.location,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update MG_COMPANY
+    set id = #{record.id,jdbcType=VARCHAR},
+    code = #{record.code,jdbcType=VARCHAR},
+    name = #{record.name,jdbcType=VARCHAR},
+    description = #{record.description,jdbcType=VARCHAR},
+    industry = #{record.industry,jdbcType=VARCHAR},
+    people_size = #{record.peopleSize,jdbcType=VARCHAR},
+    working_time = #{record.workingTime,jdbcType=VARCHAR},
+    legal_people = #{record.legalPeople,jdbcType=VARCHAR},
+    legal_mobile = #{record.legalMobile,jdbcType=VARCHAR},
+    contact_people = #{record.contactPeople,jdbcType=VARCHAR},
+    contact_mobile = #{record.contactMobile,jdbcType=VARCHAR},
+    busniess_num = #{record.busniessNum,jdbcType=VARCHAR},
+    busniess_license = #{record.busniessLicense,jdbcType=VARCHAR},
+    icon_logo = #{record.iconLogo,jdbcType=VARCHAR},
+    region = #{record.region,jdbcType=VARCHAR},
+    location = #{record.location,jdbcType=VARCHAR},
+    create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cnesa.authority.entity.Company">
+    update MG_COMPANY
+    <set>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="industry != null">
+        industry = #{industry,jdbcType=VARCHAR},
+      </if>
+      <if test="peopleSize != null">
+        people_size = #{peopleSize,jdbcType=VARCHAR},
+      </if>
+      <if test="workingTime != null">
+        working_time = #{workingTime,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPeople != null">
+        legal_people = #{legalPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="legalMobile != null">
+        legal_mobile = #{legalMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPeople != null">
+        contact_people = #{contactPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null">
+        contact_mobile = #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="busniessNum != null">
+        busniess_num = #{busniessNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busniessLicense != null">
+        busniess_license = #{busniessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="iconLogo != null">
+        icon_logo = #{iconLogo,jdbcType=VARCHAR},
+      </if>
+      <if test="region != null">
+        region = #{region,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null">
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cnesa.authority.entity.Company">
+    update MG_COMPANY
+    set code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      industry = #{industry,jdbcType=VARCHAR},
+      people_size = #{peopleSize,jdbcType=VARCHAR},
+      working_time = #{workingTime,jdbcType=VARCHAR},
+      legal_people = #{legalPeople,jdbcType=VARCHAR},
+      legal_mobile = #{legalMobile,jdbcType=VARCHAR},
+      contact_people = #{contactPeople,jdbcType=VARCHAR},
+      contact_mobile = #{contactMobile,jdbcType=VARCHAR},
+      busniess_num = #{busniessNum,jdbcType=VARCHAR},
+      busniess_license = #{busniessLicense,jdbcType=VARCHAR},
+      icon_logo = #{iconLogo,jdbcType=VARCHAR},
+      region = #{region,jdbcType=VARCHAR},
+      location = #{location,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <!-- 自定义 -->
+  <select id="selectByUserId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM MG_COMPANY c
+    LEFT JOIN MG_COMPANY_USER cu ON c.id = cu.com_id
+    WHERE cu.user_id = #{userId}
+  </select>
+
+  <select id="selectCompanyList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from MG_COMPANY
+    order by ${sort} ${order}
+  </select>
+</mapper>
